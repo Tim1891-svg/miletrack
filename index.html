@@ -6,11 +6,10 @@
   <title>MileTrack Gig HUD</title>
   <meta name="theme-color" content="#09090b">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background-color: #09090b; color: #f4f4f5; -webkit-tap-highlight-color: transparent; }
-    input, button, select { font-size: 16px; } /* Prevents iOS auto-zoom */
+    input, button, select { font-size: 16px; }
   </style>
 </head>
 <body class="p-4 pb-12 max-w-md mx-auto select-none">
@@ -21,10 +20,44 @@
       <h1 class="text-xl font-bold text-amber-400 flex items-center gap-1.5">
         <span>🚗</span> MileTrack HUD
       </h1>
-      <p class="text-xs text-zinc-400">Uber Eats & Grubhub Companion</p>
+      <p class="text-xs text-zinc-400">Uber Eats & Grubhub Pro</p>
     </div>
-    <div class="text-right">
-      <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-1 rounded-full font-mono">IRS $0.67/mi</span>
+    <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-1 rounded-full font-mono">IRS $0.67/mi</span>
+  </div>
+
+  <!-- CLOUD IMPORT BANNER -->
+  <div class="bg-gradient-to-r from-emerald-950/60 to-zinc-900 border border-emerald-800/60 rounded-2xl p-3 mb-4 shadow-lg">
+    <div class="flex justify-between items-center">
+      <div>
+        <div class="text-xs font-bold text-emerald-400">☁️ Cloud Timeline Import</div>
+        <div class="text-[11px] text-zinc-400">Import Google Maps Timeline.json</div>
+      </div>
+      <label class="px-3 py-2 bg-emerald-600 active:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer shadow">
+        📂 Import File
+        <input type="file" id="timelineFileInput" accept=".json" onchange="importTimelineJson(event)" class="hidden">
+      </label>
+    </div>
+  </div>
+
+  <!-- AUDIO SPACE BAR -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 mb-4 shadow-lg">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">🎧 Driving Audio Space</span>
+      <span class="text-[10px] bg-red-900/60 text-red-300 px-2 py-0.5 rounded-full font-bold">YT Music</span>
+    </div>
+    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+      <a href="https://music.youtube.com/search?q=Christian+Hip+Hop+Workout+Mix" target="_blank"
+         class="p-2 bg-zinc-800 active:bg-zinc-700 rounded-xl font-bold text-emerald-400 border border-zinc-700 block">
+        🔥 CHH Gym
+      </a>
+      <a href="https://music.youtube.com/search?q=2000s+RnB+Hip+Hop+Workout+Mix" target="_blank"
+         class="p-2 bg-zinc-800 active:bg-zinc-700 rounded-xl font-bold text-amber-400 border border-zinc-700 block">
+        📻 2000s R&B
+      </a>
+      <a href="https://music.youtube.com/search?q=Kirk+Franklin+Upbeat+Praise+Mix" target="_blank"
+         class="p-2 bg-zinc-800 active:bg-zinc-700 rounded-xl font-bold text-sky-400 border border-zinc-700 block">
+        ✨ Soul Groove
+      </a>
     </div>
   </div>
 
@@ -32,7 +65,7 @@
   <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-4 shadow-lg">
     <div class="flex justify-between items-center mb-2">
       <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">⚡ Offer Profit Evaluator</span>
-      <div class="flex gap-1.5" id="platformToggle">
+      <div class="flex gap-1.5">
         <button onclick="setPlatform('Uber Eats')" id="btnUber" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white">Uber Eats</button>
         <button onclick="setPlatform('Grubhub')" id="btnGH" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-zinc-800 text-zinc-400">Grubhub</button>
       </div>
@@ -51,7 +84,6 @@
       </div>
     </div>
 
-    <!-- Live Results Dashboard -->
     <div class="grid grid-cols-3 gap-2 mt-3 text-center">
       <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800/80">
         <div class="text-[10px] text-zinc-400 uppercase">Rate / Mi</div>
@@ -66,7 +98,6 @@
         <div id="resTax" class="text-base font-bold text-sky-400">+$0.00</div>
       </div>
     </div>
-
     <div id="adviceBanner" class="mt-3 text-center py-1.5 text-xs font-bold rounded-lg hidden"></div>
   </div>
 
@@ -74,12 +105,10 @@
   <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-4 shadow-lg">
     <div class="flex justify-between items-center mb-2">
       <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">📍 Quick Navigation</span>
-      <button onclick="pasteClipboard()" class="text-xs text-sky-400 hover:text-sky-300 font-medium">📋 Paste Address</button>
+      <button onclick="pasteClipboard()" class="text-xs text-sky-400 font-medium">📋 Paste Address</button>
     </div>
-
     <input type="text" id="navAddress" placeholder="Paste restaurant or customer address..." 
            class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-400">
-
     <div class="grid grid-cols-2 gap-3 mt-3">
       <button onclick="launchNav('google')" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-md">
         <span>🗺️</span> Google Maps
@@ -90,7 +119,7 @@
     </div>
   </div>
 
-  <!-- SECTION 3: SHIFT ODOMETER TRACKER -->
+  <!-- SECTION 3: SHIFT ODOMETER TRACKER & SYNC -->
   <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-lg">
     <div class="flex justify-between items-center mb-2">
       <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">🕒 Shift Mileage Logger</span>
@@ -125,12 +154,18 @@
       </div>
     </div>
 
-    <!-- History / Export -->
-    <div class="mt-4 pt-3 border-t border-zinc-800/80 flex justify-between items-center">
-      <span id="totalLoggedMiles" class="text-xs text-zinc-400 font-medium">Total: 0.0 miles logged</span>
-      <button onclick="exportCSV()" class="text-xs text-amber-400 hover:text-amber-300 font-semibold underline">
-        📥 Export IRS CSV
-      </button>
+    <!-- History & Sync Actions -->
+    <div class="mt-4 pt-3 border-t border-zinc-800 flex flex-col gap-2">
+      <div class="flex justify-between items-center">
+        <span id="totalLoggedMiles" class="text-xs text-zinc-400 font-medium">Total: 0.0 miles</span>
+        <button onclick="exportCSV()" class="text-xs text-amber-400 font-semibold underline">
+          📥 Export IRS CSV
+        </button>
+      </div>
+      <div class="flex justify-between items-center pt-2 border-t border-zinc-800/60 text-[11px]">
+        <button onclick="backupSyncJson()" class="text-sky-400 hover:text-sky-300 underline">💾 Backup (JSON)</button>
+        <button onclick="clearHistory()" class="text-zinc-500 hover:text-red-400">Reset</button>
+      </div>
     </div>
   </div>
 
@@ -138,10 +173,7 @@
     let activePlatform = 'Uber Eats';
     let currentShiftStart = localStorage.getItem('shift_start') ? Number(localStorage.getItem('shift_start')) : null;
 
-    // Initialize shift status on load
-    if (currentShiftStart) {
-      showActiveShift(currentShiftStart);
-    }
+    if (currentShiftStart) showActiveShift(currentShiftStart);
     updateTotalMiles();
 
     function setPlatform(name) {
@@ -161,7 +193,7 @@
 
       if (miles > 0 && pay > 0) {
         const rate = (pay / miles).toFixed(2);
-        const gasCost = (miles * 0.14).toFixed(2); // ~$0.14/mi estimate
+        const gasCost = (miles * 0.14).toFixed(2);
         const taxWriteoff = (miles * 0.67).toFixed(2);
 
         const rateEl = document.getElementById('resRate');
@@ -192,21 +224,14 @@
         const text = await navigator.clipboard.readText();
         document.getElementById('navAddress').value = text;
       } catch (e) {
-        alert('Please paste the address directly into the box.');
+        alert('Paste address directly into the box.');
       }
-    }
-
-    function cleanAddress(raw) {
-      return raw.replace(/(apt|suite|unit|bldg|ste)\s*#?[a-z0-9-]+/gi, '').trim();
     }
 
     function launchNav(app) {
       const address = document.getElementById('navAddress').value.trim();
-      if (!address) {
-        alert('Please enter or paste an address first.');
-        return;
-      }
-      const clean = encodeURIComponent(cleanAddress(address));
+      if (!address) { alert('Enter or paste an address first.'); return; }
+      const clean = encodeURIComponent(address.replace(/(apt|suite|unit|bldg|ste)\s*#?[a-z0-9-]+/gi, '').trim());
       const url = app === 'google'
         ? `https://www.google.com/maps/dir/?api=1&destination=${clean}&travelmode=driving`
         : `https://waze.com/ul?q=${clean}&navigate=yes`;
@@ -215,7 +240,7 @@
 
     function startShift() {
       const odo = parseFloat(document.getElementById('startOdo').value);
-      if (!odo) { alert('Enter your starting odometer.'); return; }
+      if (!odo) { alert('Enter starting odometer.'); return; }
       currentShiftStart = odo;
       localStorage.setItem('shift_start', odo);
       showActiveShift(odo);
@@ -241,7 +266,7 @@
       const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
       history.push({
         date: new Date().toISOString().split('T')[0],
-        time: new Date().toLocaleTimeString(),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         startOdo: currentShiftStart,
         endOdo: endOdo,
         miles: miles,
@@ -266,23 +291,86 @@
     function updateTotalMiles() {
       const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
       const total = history.reduce((sum, item) => sum + item.miles, 0);
-      document.getElementById('totalLoggedMiles').innerText = `Total: ${total.toFixed(1)} miles ($${(total * 0.67).toFixed(2)} write-off)`;
+      document.getElementById('totalLoggedMiles').innerText = `Total: ${total.toFixed(1)} mi ($${(total * 0.67).toFixed(2)} write-off)`;
+    }
+
+    // CLOUD TIMELINE IMPORTER
+    function importTimelineJson(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const raw = JSON.parse(evt.target.result);
+          const segments = raw.semanticSegments || raw.timelineObjects || [];
+          let count = 0;
+          let addedMiles = 0;
+          const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
+
+          segments.forEach(seg => {
+            const act = seg.activity || (seg.activitySegment);
+            if (act && act.topCandidate && act.topCandidate.type) {
+              const type = act.topCandidate.type;
+              if (type.match(/IN_PASSENGER_VEHICLE|MOTORCYCLING|IN_VEHICLE/)) {
+                const meters = Number(act.distanceMeters || act.distance) || 0;
+                if (meters >= 100) {
+                  const miles = Number((meters * 0.000621371).toFixed(2));
+                  const deduction = Number((miles * 0.67).toFixed(2));
+                  const dt = new Date(seg.startTime || (act.duration && act.duration.startTimestamp));
+                  history.push({
+                    date: dt.toISOString().split('T')[0],
+                    time: dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    startOdo: 0,
+                    endOdo: 0,
+                    miles: miles,
+                    deduction: deduction,
+                    purpose: 'Delivery Shift (Google Timeline)'
+                  });
+                  count++;
+                  addedMiles += miles;
+                }
+              }
+            }
+          });
+
+          localStorage.setItem('miletrack_history', JSON.stringify(history));
+          updateTotalMiles();
+          alert(`✓ SUCCESS!\nImported ${count} driving trips.\nAdded ${addedMiles.toFixed(1)} miles ($${(addedMiles * 0.67).toFixed(2)} tax write-off)!`);
+        } catch (err) {
+          alert('Error importing Timeline: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
     }
 
     function exportCSV() {
       const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
       if (history.length === 0) { alert('No shifts logged yet.'); return; }
-
       let csv = 'Date,Time,Start Odometer,End Odometer,Miles,Tax Deduction,Purpose\n';
       history.forEach(h => {
         csv += `"${h.date}","${h.time}",${h.startOdo},${h.endOdo},${h.miles},"$${h.deduction}","${h.purpose}"\n`;
       });
+      downloadFile(csv, 'IRS_Delivery_Mileage_Log.csv', 'text/csv');
+    }
 
-      const blob = new Blob([csv], { type: 'text/csv' });
+    function backupSyncJson() {
+      const history = localStorage.getItem('miletrack_history') || '[]';
+      downloadFile(history, 'miletrack_backup.json', 'application/json');
+    }
+
+    function clearHistory() {
+      if (confirm('Are you sure you want to clear your logged miles?')) {
+        localStorage.removeItem('miletrack_history');
+        updateTotalMiles();
+      }
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'IRS_Delivery_Mileage_Log.csv';
+      a.download = filename;
       a.click();
     }
   </script>
