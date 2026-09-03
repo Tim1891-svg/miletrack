@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MileTrack Gig HUD</title>
+  <meta name="theme-color" content="#09090b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #09090b; color: #f4f4f5; -webkit-tap-highlight-color: transparent; }
+    input, button, select { font-size: 16px; } /* Prevents iOS auto-zoom */
+  </style>
+</head>
+<body class="p-4 pb-12 max-w-md mx-auto select-none">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-4 pb-3 border-b border-zinc-800">
+    <div>
+      <h1 class="text-xl font-bold text-amber-400 flex items-center gap-1.5">
+        <span>🚗</span> MileTrack HUD
+      </h1>
+      <p class="text-xs text-zinc-400">Uber Eats & Grubhub Companion</p>
+    </div>
+    <div class="text-right">
+      <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-1 rounded-full font-mono">IRS $0.67/mi</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: FAST ORDER CHECKER -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-4 shadow-lg">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">⚡ Offer Profit Evaluator</span>
+      <div class="flex gap-1.5" id="platformToggle">
+        <button onclick="setPlatform('Uber Eats')" id="btnUber" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white">Uber Eats</button>
+        <button onclick="setPlatform('Grubhub')" id="btnGH" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-zinc-800 text-zinc-400">Grubhub</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mt-3">
+      <div>
+        <label class="text-[11px] text-zinc-400">Offer Pay ($)</label>
+        <input type="number" id="offerPay" placeholder="e.g. 9.50" step="0.50" oninput="calculateOffer()" 
+               class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-amber-400">
+      </div>
+      <div>
+        <label class="text-[11px] text-zinc-400">Total Miles</label>
+        <input type="number" id="offerMiles" placeholder="e.g. 4.2" step="0.1" oninput="calculateOffer()" 
+               class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-amber-400">
+      </div>
+    </div>
+
+    <!-- Live Results Dashboard -->
+    <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800/80">
+        <div class="text-[10px] text-zinc-400 uppercase">Rate / Mi</div>
+        <div id="resRate" class="text-base font-black text-zinc-500">$0.00</div>
+      </div>
+      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800/80">
+        <div class="text-[10px] text-zinc-400 uppercase">Gas Cost</div>
+        <div id="resGas" class="text-base font-bold text-red-400">-$0.00</div>
+      </div>
+      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800/80">
+        <div class="text-[10px] text-zinc-400 uppercase">Tax Write-off</div>
+        <div id="resTax" class="text-base font-bold text-sky-400">+$0.00</div>
+      </div>
+    </div>
+
+    <div id="adviceBanner" class="mt-3 text-center py-1.5 text-xs font-bold rounded-lg hidden"></div>
+  </div>
+
+  <!-- SECTION 2: 1-TAP NAVIGATION -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-4 shadow-lg">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">📍 Quick Navigation</span>
+      <button onclick="pasteClipboard()" class="text-xs text-sky-400 hover:text-sky-300 font-medium">📋 Paste Address</button>
+    </div>
+
+    <input type="text" id="navAddress" placeholder="Paste restaurant or customer address..." 
+           class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-400">
+
+    <div class="grid grid-cols-2 gap-3 mt-3">
+      <button onclick="launchNav('google')" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-md">
+        <span>🗺️</span> Google Maps
+      </button>
+      <button onclick="launchNav('waze')" class="w-full py-3 bg-cyan-600 active:bg-cyan-700 rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-md">
+        <span>🧭</span> Waze
+      </button>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SHIFT ODOMETER TRACKER -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-lg">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">🕒 Shift Mileage Logger</span>
+      <span id="shiftStatus" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-zinc-800 text-zinc-400">OFFLINE</span>
+    </div>
+
+    <div id="shiftInactive">
+      <label class="text-[11px] text-zinc-400">Starting Odometer</label>
+      <div class="flex gap-2 mt-1">
+        <input type="number" id="startOdo" placeholder="e.g. 114250" 
+               class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-white font-bold focus:outline-none">
+        <button onclick="startShift()" class="px-5 py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-sm">
+          Start Shift
+        </button>
+      </div>
+    </div>
+
+    <div id="shiftActive" class="hidden space-y-3">
+      <div class="flex justify-between items-center text-xs bg-emerald-950/40 border border-emerald-800/50 p-2.5 rounded-xl">
+        <span class="text-emerald-400 font-bold">● Driving Shift in Progress</span>
+        <span id="activeStartVal" class="text-zinc-300 font-mono">Started: 0 mi</span>
+      </div>
+      <div>
+        <label class="text-[11px] text-zinc-400">Ending Odometer</label>
+        <div class="flex gap-2 mt-1">
+          <input type="number" id="endOdo" placeholder="e.g. 114320" 
+                 class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-white font-bold focus:outline-none">
+          <button onclick="endShift()" class="px-5 py-2.5 bg-red-600 active:bg-red-700 rounded-xl font-bold text-sm">
+            End Shift
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- History / Export -->
+    <div class="mt-4 pt-3 border-t border-zinc-800/80 flex justify-between items-center">
+      <span id="totalLoggedMiles" class="text-xs text-zinc-400 font-medium">Total: 0.0 miles logged</span>
+      <button onclick="exportCSV()" class="text-xs text-amber-400 hover:text-amber-300 font-semibold underline">
+        📥 Export IRS CSV
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let activePlatform = 'Uber Eats';
+    let currentShiftStart = localStorage.getItem('shift_start') ? Number(localStorage.getItem('shift_start')) : null;
+
+    // Initialize shift status on load
+    if (currentShiftStart) {
+      showActiveShift(currentShiftStart);
+    }
+    updateTotalMiles();
+
+    function setPlatform(name) {
+      activePlatform = name;
+      document.getElementById('btnUber').className = name === 'Uber Eats' 
+        ? 'px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white' 
+        : 'px-2.5 py-1 text-xs rounded-lg font-bold bg-zinc-800 text-zinc-400';
+      document.getElementById('btnGH').className = name === 'Grubhub' 
+        ? 'px-2.5 py-1 text-xs rounded-lg font-bold bg-orange-600 text-white' 
+        : 'px-2.5 py-1 text-xs rounded-lg font-bold bg-zinc-800 text-zinc-400';
+    }
+
+    function calculateOffer() {
+      const pay = parseFloat(document.getElementById('offerPay').value) || 0;
+      const miles = parseFloat(document.getElementById('offerMiles').value) || 0;
+      const banner = document.getElementById('adviceBanner');
+
+      if (miles > 0 && pay > 0) {
+        const rate = (pay / miles).toFixed(2);
+        const gasCost = (miles * 0.14).toFixed(2); // ~$0.14/mi estimate
+        const taxWriteoff = (miles * 0.67).toFixed(2);
+
+        const rateEl = document.getElementById('resRate');
+        rateEl.innerText = `$${rate}`;
+        rateEl.className = rate >= 1.75 ? 'text-base font-black text-emerald-400' : (rate >= 1.25 ? 'text-base font-black text-amber-400' : 'text-base font-black text-red-400');
+
+        document.getElementById('resGas').innerText = `-$${gasCost}`;
+        document.getElementById('resTax').innerText = `+$${taxWriteoff}`;
+
+        banner.classList.remove('hidden');
+        if (rate >= 1.75) {
+          banner.className = 'mt-3 text-center py-1.5 text-xs font-bold rounded-lg bg-emerald-900/60 text-emerald-300 border border-emerald-700';
+          banner.innerText = '✅ GREAT OFFER - High $/mile';
+        } else if (rate >= 1.25) {
+          banner.className = 'mt-3 text-center py-1.5 text-xs font-bold rounded-lg bg-amber-900/60 text-amber-300 border border-amber-700';
+          banner.innerText = '⚠️ DECENT OFFER - Check Drop-off Location';
+        } else {
+          banner.className = 'mt-3 text-center py-1.5 text-xs font-bold rounded-lg bg-red-900/60 text-red-300 border border-red-700';
+          banner.innerText = '❌ LOW OFFER - Barely covers gas & vehicle wear';
+        }
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    async function pasteClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('navAddress').value = text;
+      } catch (e) {
+        alert('Please paste the address directly into the box.');
+      }
+    }
+
+    function cleanAddress(raw) {
+      return raw.replace(/(apt|suite|unit|bldg|ste)\s*#?[a-z0-9-]+/gi, '').trim();
+    }
+
+    function launchNav(app) {
+      const address = document.getElementById('navAddress').value.trim();
+      if (!address) {
+        alert('Please enter or paste an address first.');
+        return;
+      }
+      const clean = encodeURIComponent(cleanAddress(address));
+      const url = app === 'google'
+        ? `https://www.google.com/maps/dir/?api=1&destination=${clean}&travelmode=driving`
+        : `https://waze.com/ul?q=${clean}&navigate=yes`;
+      window.open(url, '_blank');
+    }
+
+    function startShift() {
+      const odo = parseFloat(document.getElementById('startOdo').value);
+      if (!odo) { alert('Enter your starting odometer.'); return; }
+      currentShiftStart = odo;
+      localStorage.setItem('shift_start', odo);
+      showActiveShift(odo);
+    }
+
+    function showActiveShift(odo) {
+      document.getElementById('shiftInactive').classList.add('hidden');
+      document.getElementById('shiftActive').classList.remove('hidden');
+      document.getElementById('activeStartVal').innerText = `Started: ${odo} mi`;
+      document.getElementById('shiftStatus').innerText = 'ON DUTY';
+      document.getElementById('shiftStatus').className = 'text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-600 text-white';
+    }
+
+    function endShift() {
+      const endOdo = parseFloat(document.getElementById('endOdo').value);
+      if (!endOdo || endOdo <= currentShiftStart) {
+        alert('End odometer must be greater than starting odometer.');
+        return;
+      }
+      const miles = endOdo - currentShiftStart;
+      const deduction = (miles * 0.67).toFixed(2);
+
+      const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
+      history.push({
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString(),
+        startOdo: currentShiftStart,
+        endOdo: endOdo,
+        miles: miles,
+        deduction: deduction,
+        purpose: 'Delivery Shift (Uber Eats / Grubhub)'
+      });
+      localStorage.setItem('miletrack_history', JSON.stringify(history));
+
+      localStorage.removeItem('shift_start');
+      currentShiftStart = null;
+      document.getElementById('shiftInactive').classList.remove('hidden');
+      document.getElementById('shiftActive').classList.add('hidden');
+      document.getElementById('shiftStatus').innerText = 'OFFLINE';
+      document.getElementById('shiftStatus').className = 'text-[10px] px-2 py-0.5 rounded-full font-bold bg-zinc-800 text-zinc-400';
+      document.getElementById('startOdo').value = endOdo;
+      document.getElementById('endOdo').value = '';
+
+      alert(`✓ Shift Logged: ${miles} miles\nTax Write-off: $${deduction}`);
+      updateTotalMiles();
+    }
+
+    function updateTotalMiles() {
+      const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
+      const total = history.reduce((sum, item) => sum + item.miles, 0);
+      document.getElementById('totalLoggedMiles').innerText = `Total: ${total.toFixed(1)} miles ($${(total * 0.67).toFixed(2)} write-off)`;
+    }
+
+    function exportCSV() {
+      const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
+      if (history.length === 0) { alert('No shifts logged yet.'); return; }
+
+      let csv = 'Date,Time,Start Odometer,End Odometer,Miles,Tax Deduction,Purpose\n';
+      history.forEach(h => {
+        csv += `"${h.date}","${h.time}",${h.startOdo},${h.endOdo},${h.miles},"$${h.deduction}","${h.purpose}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'IRS_Delivery_Mileage_Log.csv';
+      a.click();
+    }
+  </script>
+</body>
+</html>
