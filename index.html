@@ -3,287 +3,415 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MileTrack Gig HUD</title>
+  <title>MileTrack Pro — Gig HUD</title>
   <meta name="theme-color" content="#09090b">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background-color: #09090b; color: #f4f4f5; -webkit-tap-highlight-color: transparent; }
-    input, button, select { font-size: 16px; } /* Prevents iOS auto-zoom */
+    input, button, select { font-size: 16px; }
   </style>
 </head>
-<body class="p-4 pb-12 max-w-md mx-auto select-none">
+<body class="p-3 pb-16 max-w-md mx-auto select-none space-y-3">
 
-  <!-- Header -->
-  <div class="flex justify-between items-center mb-4 pb-3 border-b border-zinc-800">
+  <!-- HEADER -->
+  <div class="flex justify-between items-center pb-2 border-b border-zinc-800">
     <div>
-      <h1 class="text-xl font-bold text-amber-400 flex items-center gap-1.5">
-        <span>🚗</span> MileTrack HUD
+      <h1 class="text-lg font-black text-amber-400 flex items-center gap-1.5">
+        <span>🚗</span> MileTrack Pro
       </h1>
-      <p class="text-xs text-zinc-400">Uber Eats & Grubhub Companion</p>
+      <p class="text-[11px] text-zinc-400">Uber Eats & Grubhub Cockpit</p>
     </div>
     <div class="text-right">
-      <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-1 rounded-full font-mono">IRS $0.67/mi</span>
+      <span id="shiftBadge" class="text-[10px] px-2.5 py-1 rounded-full font-bold bg-zinc-800 text-zinc-400">OFFLINE</span>
     </div>
   </div>
 
-  <!-- SECTION 1: FAST ORDER CHECKER -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-4 shadow-lg">
+  <!-- SECTION 1: LIVE SHIFT GPS & SPEEDOMETER -->
+  <div class="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-xl">
     <div class="flex justify-between items-center mb-2">
-      <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">⚡ Offer Profit Evaluator</span>
-      <div class="flex gap-1.5" id="platformToggle">
-        <button onclick="setPlatform('Uber Eats')" id="btnUber" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white">Uber Eats</button>
-        <button onclick="setPlatform('Grubhub')" id="btnGH" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-zinc-800 text-zinc-400">Grubhub</button>
+      <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">🛰️ Live Driving Shift</span>
+      <span id="gpsStatus" class="text-[10px] text-zinc-500 font-mono">GPS: Standby</span>
+    </div>
+
+    <!-- Live Telemetry -->
+    <div class="grid grid-cols-3 gap-2 text-center my-3">
+      <div class="bg-zinc-900/90 p-2.5 rounded-xl border border-zinc-800">
+        <div class="text-[10px] text-zinc-400 uppercase">Live Miles</div>
+        <div id="liveMiles" class="text-xl font-black text-emerald-400 font-mono">0.0</div>
+      </div>
+      <div class="bg-zinc-900/90 p-2.5 rounded-xl border border-zinc-800">
+        <div class="text-[10px] text-zinc-400 uppercase">Speed</div>
+        <div id="liveSpeed" class="text-xl font-black text-sky-400 font-mono">0 <span class="text-xs font-normal">MPH</span></div>
+      </div>
+      <div class="bg-zinc-900/90 p-2.5 rounded-xl border border-zinc-800">
+        <div class="text-[10px] text-zinc-400 uppercase">Shift Time</div>
+        <div id="shiftTimer" class="text-xl font-black text-amber-400 font-mono">00:00</div>
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-3 mt-3">
-      <div>
-        <label class="text-[11px] text-zinc-400">Offer Pay ($)</label>
-        <input type="number" id="offerPay" placeholder="e.g. 9.50" step="0.50" oninput="calculateOffer()" 
-               class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-amber-400">
-      </div>
-      <div>
-        <label class="text-[11px] text-zinc-400">Total Miles</label>
-        <input type="number" id="offerMiles" placeholder="e.g. 4.2" step="0.1" oninput="calculateOffer()" 
-               class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-amber-400">
-      </div>
-    </div>
-
-    <!-- Live Results Dashboard -->
-    <div class="grid grid-cols-3 gap-2 mt-3 text-center">
-      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800/80">
-        <div class="text-[10px] text-zinc-400 uppercase">Rate / Mi</div>
-        <div id="resRate" class="text-base font-black text-zinc-500">$0.00</div>
-      </div>
-      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800/80">
-        <div class="text-[10px] text-zinc-400 uppercase">Gas Cost</div>
-        <div id="resGas" class="text-base font-bold text-red-400">-$0.00</div>
-      </div>
-      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800/80">
-        <div class="text-[10px] text-zinc-400 uppercase">Tax Write-off</div>
-        <div id="resTax" class="text-base font-bold text-sky-400">+$0.00</div>
-      </div>
-    </div>
-
-    <div id="adviceBanner" class="mt-3 text-center py-1.5 text-xs font-bold rounded-lg hidden"></div>
-  </div>
-
-  <!-- SECTION 2: 1-TAP NAVIGATION -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-4 shadow-lg">
-    <div class="flex justify-between items-center mb-2">
-      <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">📍 Quick Navigation</span>
-      <button onclick="pasteClipboard()" class="text-xs text-sky-400 hover:text-sky-300 font-medium">📋 Paste Address</button>
-    </div>
-
-    <input type="text" id="navAddress" placeholder="Paste restaurant or customer address..." 
-           class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-400">
-
-    <div class="grid grid-cols-2 gap-3 mt-3">
-      <button onclick="launchNav('google')" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-md">
-        <span>🗺️</span> Google Maps
-      </button>
-      <button onclick="launchNav('waze')" class="w-full py-3 bg-cyan-600 active:bg-cyan-700 rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-md">
-        <span>🧭</span> Waze
+    <!-- Shift Action Buttons -->
+    <div id="shiftStartControls">
+      <button onclick="toggleShift()" id="btnShiftToggle" class="w-full py-3 bg-emerald-600 active:bg-emerald-700 rounded-xl font-black text-sm tracking-wide shadow-lg transition">
+        ▶ START DRIVING SHIFT (AUTO-GPS)
       </button>
     </div>
   </div>
 
-  <!-- SECTION 3: SHIFT ODOMETER TRACKER -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-lg">
+  <!-- SECTION 2: LIVE FINANCIALS & HOURLY RATE -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl">
     <div class="flex justify-between items-center mb-2">
-      <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">🕒 Shift Mileage Logger</span>
-      <span id="shiftStatus" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-zinc-800 text-zinc-400">OFFLINE</span>
+      <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">💵 Today's Net Profit & Hourly</span>
+      <button onclick="showOrderLogger()" class="text-xs text-amber-400 font-bold hover:underline">+ Log Delivery Pay</button>
     </div>
 
-    <div id="shiftInactive">
-      <label class="text-[11px] text-zinc-400">Starting Odometer</label>
-      <div class="flex gap-2 mt-1">
-        <input type="number" id="startOdo" placeholder="e.g. 114250" 
-               class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-white font-bold focus:outline-none">
-        <button onclick="startShift()" class="px-5 py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-sm">
-          Start Shift
+    <div class="grid grid-cols-4 gap-1.5 text-center">
+      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800">
+        <div class="text-[9px] text-zinc-400 uppercase">Gross</div>
+        <div id="dispGross" class="text-sm font-black text-white">$0.00</div>
+      </div>
+      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800">
+        <div class="text-[9px] text-zinc-400 uppercase">Est. Gas</div>
+        <div id="dispGas" class="text-sm font-black text-red-400">-$0.00</div>
+      </div>
+      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800">
+        <div class="text-[9px] text-zinc-400 uppercase">Net Pay</div>
+        <div id="dispNet" class="text-sm font-black text-emerald-400">$0.00</div>
+      </div>
+      <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-800">
+        <div class="text-[9px] text-zinc-400 uppercase">Rate/Hr</div>
+        <div id="dispHourly" class="text-sm font-black text-amber-400">$0.00</div>
+      </div>
+    </div>
+
+    <!-- Order Quick Log Modal/Panel -->
+    <div id="orderLogPanel" class="hidden mt-3 p-3 bg-zinc-950 rounded-xl border border-zinc-700/80 space-y-2">
+      <div class="flex justify-between items-center">
+        <span class="text-[11px] font-bold text-zinc-300">Add Completed Order Payout:</span>
+        <button onclick="hideOrderLogger()" class="text-xs text-zinc-500 font-bold">✕</button>
+      </div>
+      <div class="flex gap-2">
+        <select id="logPlatform" class="bg-zinc-800 border border-zinc-700 rounded-lg p-2 text-xs text-white">
+          <option value="Uber Eats">Uber Eats</option>
+          <option value="Grubhub">Grubhub</option>
+        </select>
+        <input type="number" id="logPayAmount" placeholder="Payout ($)" step="0.50" 
+               class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg p-2 text-xs text-white font-bold focus:outline-none">
+        <button onclick="submitOrderPay()" class="px-3 py-2 bg-emerald-600 active:bg-emerald-700 rounded-lg text-xs font-bold text-white">
+          Save
         </button>
       </div>
     </div>
+  </div>
 
-    <div id="shiftActive" class="hidden space-y-3">
-      <div class="flex justify-between items-center text-xs bg-emerald-950/40 border border-emerald-800/50 p-2.5 rounded-xl">
-        <span class="text-emerald-400 font-bold">● Driving Shift in Progress</span>
-        <span id="activeStartVal" class="text-zinc-300 font-mono">Started: 0 mi</span>
-      </div>
-      <div>
-        <label class="text-[11px] text-zinc-400">Ending Odometer</label>
-        <div class="flex gap-2 mt-1">
-          <input type="number" id="endOdo" placeholder="e.g. 114320" 
-                 class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-white font-bold focus:outline-none">
-          <button onclick="endShift()" class="px-5 py-2.5 bg-red-600 active:bg-red-700 rounded-xl font-bold text-sm">
-            End Shift
-          </button>
-        </div>
-      </div>
+  <!-- SECTION 3: 1-TAP SMART NAVIGATION -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">📍 1-Tap Navigation</span>
+      <button onclick="pasteClipboard()" class="text-xs text-sky-400 font-bold hover:underline">📋 Paste Address</button>
     </div>
-
-    <!-- History / Export -->
-    <div class="mt-4 pt-3 border-t border-zinc-800/80 flex justify-between items-center">
-      <span id="totalLoggedMiles" class="text-xs text-zinc-400 font-medium">Total: 0.0 miles logged</span>
-      <button onclick="exportCSV()" class="text-xs text-amber-400 hover:text-amber-300 font-semibold underline">
-        📥 Export IRS CSV
+    <input type="text" id="navAddress" placeholder="Paste restaurant or customer address..." 
+           class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-400">
+    <div class="grid grid-cols-2 gap-2 mt-2.5">
+      <button onclick="launchNav('google')" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-black text-xs flex justify-center items-center gap-1.5 shadow">
+        <span>🗺️</span> GOOGLE MAPS
+      </button>
+      <button onclick="launchNav('waze')" class="w-full py-3 bg-cyan-600 active:bg-cyan-700 rounded-xl font-black text-xs flex justify-center items-center gap-1.5 shadow">
+        <span>🧭</span> WAZE
       </button>
     </div>
   </div>
 
+  <!-- SECTION 4: OFFER PROFIT CHECKER -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">⚡ Offer $/Mile Quick Check</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <input type="number" id="quickPay" placeholder="Offer Pay ($)" oninput="calcQuickOffer()" 
+             class="bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-xs text-white font-bold">
+      <input type="number" id="quickMiles" placeholder="Trip Miles" oninput="calcQuickOffer()" 
+             class="bg-zinc-800 border border-zinc-700 rounded-xl p-2.5 text-xs text-white font-bold">
+    </div>
+    <div id="quickResult" class="hidden mt-2 p-2 rounded-xl text-center text-xs font-black"></div>
+  </div>
+
+  <!-- SECTION 5: DRIVING AUDIO SPACE -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 shadow-xl">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">🎧 Driving Audio Space</span>
+      <span class="text-[10px] bg-red-900/60 text-red-300 px-2 py-0.5 rounded-full font-bold">YouTube Music</span>
+    </div>
+    <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
+      <a href="https://music.youtube.com/search?q=Christian+Hip+Hop+Workout+Mix" target="_blank"
+         class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-emerald-400 border border-zinc-700">
+        🔥 CHH Gym
+      </a>
+      <a href="https://music.youtube.com/search?q=2000s+RnB+Hip+Hop+Workout+Mix" target="_blank"
+         class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-amber-400 border border-zinc-700">
+        📻 2000s R&B
+      </a>
+      <a href="https://music.youtube.com/search?q=Kirk+Franklin+Upbeat+Praise+Mix" target="_blank"
+         class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sky-400 border border-zinc-700">
+        ✨ Soul Groove
+      </a>
+    </div>
+  </div>
+
+  <!-- FOOTER CONTROLS (EXPORT / IMPORT) -->
+  <div class="flex justify-between items-center pt-2 text-xs text-zinc-400 border-t border-zinc-800">
+    <label class="hover:text-emerald-400 cursor-pointer font-bold">
+      📂 Import Timeline.json
+      <input type="file" id="importFile" accept=".json" onchange="importTimeline(event)" class="hidden">
+    </label>
+    <button onclick="exportIRSCSV()" class="hover:text-amber-400 font-bold underline">
+      📥 Export IRS CSV
+    </button>
+  </div>
+
   <script>
-    let activePlatform = 'Uber Eats';
-    let currentShiftStart = localStorage.getItem('shift_start') ? Number(localStorage.getItem('shift_start')) : null;
+    // State variables
+    let isShiftActive = false;
+    let shiftStartMs = null;
+    let timerInterval = null;
+    let gpsWatchId = null;
+    let lastCoords = null;
+    let totalShiftMiles = 0;
+    let totalGrossPay = parseFloat(localStorage.getItem('mp_gross_pay') || '0');
 
-    // Initialize shift status on load
-    if (currentShiftStart) {
-      showActiveShift(currentShiftStart);
-    }
-    updateTotalMiles();
+    initUI();
 
-    function setPlatform(name) {
-      activePlatform = name;
-      document.getElementById('btnUber').className = name === 'Uber Eats' 
-        ? 'px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white' 
-        : 'px-2.5 py-1 text-xs rounded-lg font-bold bg-zinc-800 text-zinc-400';
-      document.getElementById('btnGH').className = name === 'Grubhub' 
-        ? 'px-2.5 py-1 text-xs rounded-lg font-bold bg-orange-600 text-white' 
-        : 'px-2.5 py-1 text-xs rounded-lg font-bold bg-zinc-800 text-zinc-400';
+    function initUI() {
+      updateFinancialDashboard();
     }
 
-    function calculateOffer() {
-      const pay = parseFloat(document.getElementById('offerPay').value) || 0;
-      const miles = parseFloat(document.getElementById('offerMiles').value) || 0;
-      const banner = document.getElementById('adviceBanner');
-
-      if (miles > 0 && pay > 0) {
-        const rate = (pay / miles).toFixed(2);
-        const gasCost = (miles * 0.14).toFixed(2); // ~$0.14/mi estimate
-        const taxWriteoff = (miles * 0.67).toFixed(2);
-
-        const rateEl = document.getElementById('resRate');
-        rateEl.innerText = `$${rate}`;
-        rateEl.className = rate >= 1.75 ? 'text-base font-black text-emerald-400' : (rate >= 1.25 ? 'text-base font-black text-amber-400' : 'text-base font-black text-red-400');
-
-        document.getElementById('resGas').innerText = `-$${gasCost}`;
-        document.getElementById('resTax').innerText = `+$${taxWriteoff}`;
-
-        banner.classList.remove('hidden');
-        if (rate >= 1.75) {
-          banner.className = 'mt-3 text-center py-1.5 text-xs font-bold rounded-lg bg-emerald-900/60 text-emerald-300 border border-emerald-700';
-          banner.innerText = '✅ GREAT OFFER - High $/mile';
-        } else if (rate >= 1.25) {
-          banner.className = 'mt-3 text-center py-1.5 text-xs font-bold rounded-lg bg-amber-900/60 text-amber-300 border border-amber-700';
-          banner.innerText = '⚠️ DECENT OFFER - Check Drop-off Location';
-        } else {
-          banner.className = 'mt-3 text-center py-1.5 text-xs font-bold rounded-lg bg-red-900/60 text-red-300 border border-red-700';
-          banner.innerText = '❌ LOW OFFER - Barely covers gas & vehicle wear';
-        }
+    // --- 1. GPS TRACKER & TELEMETRY ---
+    function toggleShift() {
+      if (!isShiftActive) {
+        startLiveShift();
       } else {
-        banner.classList.add('hidden');
+        endLiveShift();
       }
     }
 
+    function startLiveShift() {
+      isShiftActive = true;
+      shiftStartMs = Date.now();
+      totalShiftMiles = 0;
+      lastCoords = null;
+
+      document.getElementById('btnShiftToggle').innerText = '⏹ END SHIFT & SAVE LOG';
+      document.getElementById('btnShiftToggle').className = 'w-full py-3 bg-red-600 active:bg-red-700 rounded-xl font-black text-sm tracking-wide shadow-lg transition';
+      document.getElementById('shiftBadge').innerText = 'ON DUTY';
+      document.getElementById('shiftBadge').className = 'text-[10px] px-2.5 py-1 rounded-full font-bold bg-emerald-600 text-white';
+
+      // Timer
+      timerInterval = setInterval(updateTimer, 1000);
+
+      // GPS Watcher
+      if ("geolocation" in navigator) {
+        document.getElementById('gpsStatus').innerText = 'GPS: Locating...';
+        gpsWatchId = navigator.geolocation.watchPosition(
+          handleGpsSuccess,
+          handleGpsError,
+          { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+        );
+      } else {
+        document.getElementById('gpsStatus').innerText = 'GPS: Unsupported';
+      }
+    }
+
+    function handleGpsSuccess(pos) {
+      document.getElementById('gpsStatus').innerText = `GPS: ±${Math.round(pos.coords.accuracy * 3.28)}ft`;
+
+      // Live Speed
+      if (pos.coords.speed !== null && pos.coords.speed >= 0) {
+        const mph = Math.round(pos.coords.speed * 2.23694);
+        document.getElementById('liveSpeed').innerHTML = `${mph} <span class="text-xs font-normal">MPH</span>`;
+      }
+
+      // Distance calculation
+      if (lastCoords) {
+        const dist = haversineMiles(lastCoords.latitude, lastCoords.longitude, pos.coords.latitude, pos.coords.longitude);
+        // Only count real movement (above 15ft to filter GPS jitter)
+        if (dist >= 0.003) {
+          totalShiftMiles += dist;
+          document.getElementById('liveMiles').innerText = totalShiftMiles.toFixed(1);
+          updateFinancialDashboard();
+        }
+      }
+      lastCoords = pos.coords;
+    }
+
+    function handleGpsError(err) {
+      document.getElementById('gpsStatus').innerText = 'GPS: Searching...';
+    }
+
+    function updateTimer() {
+      const elapsedSec = Math.floor((Date.now() - shiftStartMs) / 1000);
+      const hrs = String(Math.floor(elapsedSec / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((elapsedSec % 3600) / 60)).padStart(2, '0');
+      document.getElementById('shiftTimer').innerText = `${hrs}:${mins}`;
+      updateFinancialDashboard();
+    }
+
+    function endLiveShift() {
+      isShiftActive = false;
+      clearInterval(timerInterval);
+      if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+
+      const deduction = (totalShiftMiles * 0.67).toFixed(2);
+      const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
+      history.push({
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        miles: parseFloat(totalShiftMiles.toFixed(2)),
+        deduction: deduction,
+        purpose: 'Delivery Shift (Live GPS)'
+      });
+      localStorage.setItem('miletrack_history', JSON.stringify(history));
+
+      document.getElementById('btnShiftToggle').innerText = '▶ START DRIVING SHIFT (AUTO-GPS)';
+      document.getElementById('btnShiftToggle').className = 'w-full py-3 bg-emerald-600 active:bg-emerald-700 rounded-xl font-black text-sm tracking-wide shadow-lg transition';
+      document.getElementById('shiftBadge').innerText = 'OFFLINE';
+      document.getElementById('shiftBadge').className = 'text-[10px] px-2.5 py-1 rounded-full font-bold bg-zinc-800 text-zinc-400';
+      document.getElementById('gpsStatus').innerText = 'GPS: Standby';
+
+      alert(`✓ Shift Saved: ${totalShiftMiles.toFixed(1)} miles\nIRS Tax Deduction: $${deduction}`);
+    }
+
+    function haversineMiles(lat1, lon1, lat2, lon2) {
+      const R = 3958.8;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+
+    // --- 2. FINANCIALS & EARNINGS ---
+    function showOrderLogger() { document.getElementById('orderLogPanel').classList.remove('hidden'); }
+    function hideOrderLogger() { document.getElementById('orderLogPanel').classList.add('hidden'); }
+
+    function submitOrderPay() {
+      const amt = parseFloat(document.getElementById('logPayAmount').value);
+      if (!amt || amt <= 0) { alert('Enter a valid payout amount.'); return; }
+      totalGrossPay += amt;
+      localStorage.setItem('mp_gross_pay', totalGrossPay.toString());
+      document.getElementById('logPayAmount').value = '';
+      hideOrderLogger();
+      updateFinancialDashboard();
+    }
+
+    function updateFinancialDashboard() {
+      const gasEst = (totalShiftMiles * 0.14);
+      const netPay = totalGrossPay - gasEst;
+
+      let elapsedHours = 1;
+      if (shiftStartMs) {
+        elapsedHours = Math.max(0.1, (Date.now() - shiftStartMs) / 3600000);
+      }
+      const hourlyRate = (netPay / elapsedHours).toFixed(2);
+
+      document.getElementById('dispGross').innerText = `$${totalGrossPay.toFixed(2)}`;
+      document.getElementById('dispGas').innerText = `-$${gasEst.toFixed(2)}`;
+      document.getElementById('dispNet').innerText = `$${netPay.toFixed(2)}`;
+      document.getElementById('dispHourly').innerText = `$${hourlyRate}/h`;
+    }
+
+    // --- 3. SMART NAVIGATION ---
     async function pasteClipboard() {
       try {
         const text = await navigator.clipboard.readText();
         document.getElementById('navAddress').value = text;
       } catch (e) {
-        alert('Please paste the address directly into the box.');
+        alert('Please paste address directly into the box.');
       }
-    }
-
-    function cleanAddress(raw) {
-      return raw.replace(/(apt|suite|unit|bldg|ste)\s*#?[a-z0-9-]+/gi, '').trim();
     }
 
     function launchNav(app) {
-      const address = document.getElementById('navAddress').value.trim();
-      if (!address) {
-        alert('Please enter or paste an address first.');
-        return;
-      }
-      const clean = encodeURIComponent(cleanAddress(address));
+      const raw = document.getElementById('navAddress').value.trim();
+      if (!raw) { alert('Enter or paste an address first.'); return; }
+      const clean = encodeURIComponent(raw.replace(/(apt|suite|unit|bldg|ste)\s*#?[a-z0-9-]+/gi, '').trim());
       const url = app === 'google'
         ? `https://www.google.com/maps/dir/?api=1&destination=${clean}&travelmode=driving`
         : `https://waze.com/ul?q=${clean}&navigate=yes`;
       window.open(url, '_blank');
     }
 
-    function startShift() {
-      const odo = parseFloat(document.getElementById('startOdo').value);
-      if (!odo) { alert('Enter your starting odometer.'); return; }
-      currentShiftStart = odo;
-      localStorage.setItem('shift_start', odo);
-      showActiveShift(odo);
-    }
-
-    function showActiveShift(odo) {
-      document.getElementById('shiftInactive').classList.add('hidden');
-      document.getElementById('shiftActive').classList.remove('hidden');
-      document.getElementById('activeStartVal').innerText = `Started: ${odo} mi`;
-      document.getElementById('shiftStatus').innerText = 'ON DUTY';
-      document.getElementById('shiftStatus').className = 'text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-600 text-white';
-    }
-
-    function endShift() {
-      const endOdo = parseFloat(document.getElementById('endOdo').value);
-      if (!endOdo || endOdo <= currentShiftStart) {
-        alert('End odometer must be greater than starting odometer.');
-        return;
+    // --- 4. QUICK OFFER EVALUATOR ---
+    function calcQuickOffer() {
+      const p = parseFloat(document.getElementById('quickPay').value) || 0;
+      const m = parseFloat(document.getElementById('quickMiles').value) || 0;
+      const res = document.getElementById('quickResult');
+      if (p > 0 && m > 0) {
+        const rate = (p / m).toFixed(2);
+        res.classList.remove('hidden');
+        if (rate >= 1.75) {
+          res.className = 'mt-2 p-2 rounded-xl text-center text-xs font-black bg-emerald-950 text-emerald-300 border border-emerald-700';
+          res.innerText = `✅ GREAT ORDER: $${rate}/mile`;
+        } else if (rate >= 1.25) {
+          res.className = 'mt-2 p-2 rounded-xl text-center text-xs font-black bg-amber-950 text-amber-300 border border-amber-700';
+          res.innerText = `⚠️ DECENT ORDER: $${rate}/mile`;
+        } else {
+          res.className = 'mt-2 p-2 rounded-xl text-center text-xs font-black bg-red-950 text-red-300 border border-red-700';
+          res.innerText = `❌ LOW ORDER: $${rate}/mile`;
+        }
+      } else {
+        res.classList.add('hidden');
       }
-      const miles = endOdo - currentShiftStart;
-      const deduction = (miles * 0.67).toFixed(2);
-
-      const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
-      history.push({
-        date: new Date().toISOString().split('T')[0],
-        time: new Date().toLocaleTimeString(),
-        startOdo: currentShiftStart,
-        endOdo: endOdo,
-        miles: miles,
-        deduction: deduction,
-        purpose: 'Delivery Shift (Uber Eats / Grubhub)'
-      });
-      localStorage.setItem('miletrack_history', JSON.stringify(history));
-
-      localStorage.removeItem('shift_start');
-      currentShiftStart = null;
-      document.getElementById('shiftInactive').classList.remove('hidden');
-      document.getElementById('shiftActive').classList.add('hidden');
-      document.getElementById('shiftStatus').innerText = 'OFFLINE';
-      document.getElementById('shiftStatus').className = 'text-[10px] px-2 py-0.5 rounded-full font-bold bg-zinc-800 text-zinc-400';
-      document.getElementById('startOdo').value = endOdo;
-      document.getElementById('endOdo').value = '';
-
-      alert(`✓ Shift Logged: ${miles} miles\nTax Write-off: $${deduction}`);
-      updateTotalMiles();
     }
 
-    function updateTotalMiles() {
+    // --- 5. IMPORT & EXPORT ---
+    function exportIRSCSV() {
       const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
-      const total = history.reduce((sum, item) => sum + item.miles, 0);
-      document.getElementById('totalLoggedMiles').innerText = `Total: ${total.toFixed(1)} miles ($${(total * 0.67).toFixed(2)} write-off)`;
-    }
-
-    function exportCSV() {
-      const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
-      if (history.length === 0) { alert('No shifts logged yet.'); return; }
-
-      let csv = 'Date,Time,Start Odometer,End Odometer,Miles,Tax Deduction,Purpose\n';
+      if (history.length === 0) { alert('No trips logged yet.'); return; }
+      let csv = 'Date,Time,Miles,Tax Deduction,Purpose\n';
       history.forEach(h => {
-        csv += `"${h.date}","${h.time}",${h.startOdo},${h.endOdo},${h.miles},"$${h.deduction}","${h.purpose}"\n`;
+        csv += `"${h.date}","${h.time}",${h.miles},"$${h.deduction}","${h.purpose}"\n`;
       });
-
       const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
+      a.href = URL.createObjectURL(blob);
       a.download = 'IRS_Delivery_Mileage_Log.csv';
       a.click();
+    }
+
+    function importTimeline(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const raw = JSON.parse(evt.target.result);
+          const segments = raw.semanticSegments || raw.timelineObjects || [];
+          let count = 0, miles = 0;
+          const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
+
+          segments.forEach(seg => {
+            const act = seg.activity || seg.activitySegment;
+            if (act && act.topCandidate && act.topCandidate.type.match(/VEHICLE|DRIVING/)) {
+              const m = Number(act.distanceMeters || act.distance) || 0;
+              if (m >= 100) {
+                const mi = Number((m * 0.000621371).toFixed(2));
+                history.push({
+                  date: new Date(seg.startTime).toISOString().split('T')[0],
+                  time: new Date(seg.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  miles: mi,
+                  deduction: Number((mi * 0.67).toFixed(2)),
+                  purpose: 'Delivery Shift (Google Timeline)'
+                });
+                count++;
+                miles += mi;
+              }
+            }
+          });
+          localStorage.setItem('miletrack_history', JSON.stringify(history));
+          alert(`✓ Imported ${count} trips (${miles.toFixed(1)} miles) from Timeline.json!`);
+        } catch (err) { alert('Error reading file: ' + err.message); }
+      };
+      reader.readAsText(file);
     }
   </script>
 </body>
