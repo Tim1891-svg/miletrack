@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MileTrack Pro — Driver Cockpit</title>
+  <title>MileTrack Pro — Gig Cockpit</title>
   <meta name="theme-color" content="#09090b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,7 @@
 </head>
 <body class="p-3 pb-24 max-w-md mx-auto select-none space-y-3">
 
-  <!-- HEADER & STATUS -->
+  <!-- HEADER -->
   <div class="flex justify-between items-center pb-2 border-b border-zinc-800">
     <div>
       <h1 class="text-xl font-black text-amber-400 flex items-center gap-1.5">
@@ -39,19 +39,19 @@
     <textarea id="geminiKeysInput" placeholder="Paste Gemini API key..." rows="2" 
               class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-xs font-mono text-white focus:outline-none focus:border-amber-400"></textarea>
     <div class="flex justify-between items-center pt-1">
-      <span class="text-[10px] text-zinc-500">Autonomous failover supported</span>
+      <span class="text-[10px] text-zinc-500">Autonomous failover active</span>
       <button onclick="saveAiKeys()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-black text-xs rounded-xl">
         Save Key
       </button>
     </div>
   </div>
 
-  <!-- SECTION 1: DRIVING SHIFT & GPS TELEMETRY (BIG GLANCEABLE NUMBERS) -->
+  <!-- SECTION 1: LIVE SHIFT GPS TELEMETRY -->
   <div class="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-xl">
     <div class="flex justify-between items-center mb-1">
       <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">🛰️ Shift Telemetry</span>
       <div class="flex items-center gap-2">
-        <span id="wakeLockStatus" class="text-[10px] text-zinc-500 font-bold">Screen Lock: Normal</span>
+        <span id="wakeLockStatus" class="text-[10px] text-zinc-500 font-bold">Screen: Normal</span>
         <span id="gpsStatus" class="text-[10px] text-zinc-500 font-mono">GPS: Standby</span>
       </div>
     </div>
@@ -71,49 +71,43 @@
       </div>
     </div>
 
-    <!-- Massive 50px Driving Button -->
     <button onclick="toggleShift()" id="btnShiftToggle" 
             class="w-full h-14 bg-emerald-600 active:bg-emerald-700 rounded-2xl font-black text-base tracking-wide shadow-xl flex items-center justify-center gap-2 transition">
       <span>▶</span> START DRIVING SHIFT
     </button>
   </div>
 
-  <!-- SECTION 2: MULTI-STOP DELIVERY ROUTER (2-3 ORDERS) -->
+  <!-- SECTION 2: MULTI-STOP DELIVERY ROUTER (2-3 BATCHED ORDERS) -->
   <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl space-y-3">
     <div class="flex justify-between items-center">
-      <span class="text-xs font-black text-amber-400 uppercase tracking-wider">📦 Multi-Stop Deliveries (2-3 Batched)</span>
-      <!-- AI Screenshot Reader Button -->
+      <span class="text-xs font-black text-amber-400 uppercase tracking-wider">📦 Multi-Stop Deliveries (2-3 Orders)</span>
       <label class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-[11px] text-sky-400 font-bold rounded-lg cursor-pointer flex items-center gap-1">
         <span>📸</span> Read Screenshot
         <input type="file" accept="image/*" onchange="parseOrderScreenshot(event)" class="hidden">
       </label>
     </div>
 
-    <!-- Stop 1 -->
     <div class="flex items-center gap-2">
       <span class="w-6 text-center text-xs font-black text-emerald-400">1</span>
       <input type="text" id="stop1" placeholder="Stop 1: Restaurant or Customer..." 
              class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
-      <button onclick="voiceDictate('stop1')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm" title="Voice Input">🎙️</button>
+      <button onclick="voiceDictate('stop1')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm">🎙️</button>
     </div>
 
-    <!-- Stop 2 -->
     <div class="flex items-center gap-2">
       <span class="w-6 text-center text-xs font-black text-amber-400">2</span>
       <input type="text" id="stop2" placeholder="Stop 2: Next Customer drop..." 
              class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
-      <button onclick="voiceDictate('stop2')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm" title="Voice Input">🎙️</button>
+      <button onclick="voiceDictate('stop2')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm">🎙️</button>
     </div>
 
-    <!-- Stop 3 (Optional) -->
     <div class="flex items-center gap-2">
       <span class="w-6 text-center text-xs font-black text-sky-400">3</span>
       <input type="text" id="stop3" placeholder="Stop 3: Final drop (Optional)..." 
              class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
-      <button onclick="voiceDictate('stop3')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm" title="Voice Input">🎙️</button>
+      <button onclick="voiceDictate('stop3')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm">🎙️</button>
     </div>
 
-    <!-- Launch Multi-Stop Google Maps Route -->
     <div class="grid grid-cols-2 gap-2 pt-1">
       <button onclick="launchMultiRoute('google')" 
               class="w-full h-12 bg-blue-600 active:bg-blue-700 rounded-xl font-black text-xs flex justify-center items-center gap-2 shadow-lg">
@@ -127,7 +121,7 @@
     <div id="ocrStatus" class="hidden text-center text-xs py-1 px-2 rounded-lg bg-zinc-800 text-zinc-300 font-bold"></div>
   </div>
 
-  <!-- SECTION 3: EARNINGS & GAS LOGGER -->
+  <!-- SECTION 3: REAL FINANCIALS & GRUBHUB AUDIT -->
   <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl space-y-3">
     <div class="flex justify-between items-center">
       <span class="text-xs font-black text-zinc-400 uppercase tracking-wider">💵 Earnings & Fuel</span>
@@ -159,7 +153,7 @@
       </div>
     </div>
 
-    <!-- Quick Pay Logger Modal -->
+    <!-- Order Quick Log Modal -->
     <div id="orderLogPanel" class="hidden p-3 bg-zinc-950 rounded-xl border border-zinc-700/80 space-y-2">
       <div class="flex justify-between items-center">
         <span class="text-xs font-bold text-zinc-300">Add Delivery Payout:</span>
@@ -201,18 +195,22 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <div class="flex justify-between items-center pt-2 text-xs text-zinc-400 border-t border-zinc-800">
-    <label class="hover:text-emerald-400 cursor-pointer font-bold">
-      📂 Import Timeline.json
-      <input type="file" id="importFile" accept=".json" onchange="importTimeline(event)" class="hidden">
+  <!-- FOOTER: GRUBHUB & TIMELINE IMPORTERS -->
+  <div class="pt-2 text-xs text-zinc-400 border-t border-zinc-800 flex justify-between items-center gap-2">
+    <label class="hover:text-amber-400 cursor-pointer font-bold flex items-center gap-1">
+      <span>🍔</span> Import Grubhub CSV
+      <input type="file" id="importGrubhubFile" accept=".csv" onchange="importGrubhubCSV(event)" class="hidden">
     </label>
-    <button onclick="exportIRSCSV()" class="hover:text-amber-400 font-bold underline">
-      📥 Export IRS CSV
+    <label class="hover:text-emerald-400 cursor-pointer font-bold flex items-center gap-1">
+      <span>🗺️</span> Timeline.json
+      <input type="file" id="importTimelineFile" accept=".json" onchange="importTimeline(event)" class="hidden">
+    </label>
+    <button onclick="exportIRSCSV()" class="hover:text-sky-400 font-bold underline">
+      📥 Export
     </button>
   </div>
 
-  <!-- SILENT AUDIO KEEP-ALIVE (Prevents phone from killing GPS in background) -->
+  <!-- SILENT AUDIO KEEP-ALIVE -->
   <audio id="keepAliveAudio" loop preload="none">
     <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
   </audio>
@@ -227,7 +225,6 @@
     let totalGrossPay = parseFloat(localStorage.getItem('mp_gross_pay') || '0');
     let wakeLock = null;
 
-    // Keys
     let geminiKeys = (localStorage.getItem('mp_gemini_keys') || '').split(',').map(k => k.trim()).filter(k => k.length > 0);
     let activeKeyIdx = 0;
 
@@ -238,7 +235,79 @@
       document.getElementById('geminiKeysInput').value = geminiKeys.join(', ');
     }
 
-    // --- SCREEN WAKE LOCK & BACKGROUND AUDIO KEEP-ALIVE ---
+    // --- GRUBHUB CSV SMART IMPORTER & DEDUPLICATOR ---
+    function importGrubhubCSV(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const lines = evt.target.result.split('\n');
+          if (lines.length < 2) return;
+
+          let acceptedCount = 0;
+          let missionCount = 0;
+          let addedEarnings = 0;
+          let addedMiles = 0;
+
+          const existingTrips = new Set(JSON.parse(localStorage.getItem('mp_gh_dedup') || '[]'));
+          const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
+
+          for (let i = 1; i < lines.length; i++) {
+            const row = lines[i].trim();
+            if (!row) continue;
+
+            const cols = row.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+            const dt = cols[0];
+            const type = cols[1];
+            const amountStr = cols[2]?.replace(/[$\s]/g, '');
+            const amount = parseFloat(amountStr) || 0;
+            const status = cols[4];
+            const restaurant = cols[5] || 'Grubhub';
+            const miles = parseFloat(cols[7]) || 0;
+
+            // Composite Deduplication Key
+            const dedupKey = `${dt}_${type}_${amount}_${restaurant}`;
+            if (existingTrips.has(dedupKey)) continue;
+
+            if (type === 'DELIVERY' && status === 'ACCEPTED') {
+              acceptedCount++;
+              addedEarnings += amount;
+              addedMiles += miles;
+              existingTrips.add(dedupKey);
+
+              history.push({
+                date: dt.split('T')[0],
+                time: dt.split('T')[1]?.substring(0, 5) || '',
+                miles: miles,
+                deduction: (miles * 0.67).toFixed(2),
+                purpose: `Grubhub Delivery (${restaurant})`
+              });
+            } else if (type === 'MISSION' && amount > 0) {
+              missionCount++;
+              addedEarnings += amount;
+              existingTrips.add(dedupKey);
+            }
+          }
+
+          localStorage.setItem('mp_gh_dedup', JSON.stringify(Array.from(existingTrips)));
+          localStorage.setItem('miletrack_history', JSON.stringify(history));
+
+          totalGrossPay += addedEarnings;
+          localStorage.setItem('mp_gross_pay', totalGrossPay.toString());
+
+          updateFinancialDashboard();
+
+          alert(`✓ GRUBHUB IMPORT COMPLETE!\n• Added: ${acceptedCount} Deliveries & ${missionCount} Missions\n• New Earnings: +$${addedEarnings.toFixed(2)}\n• Engaged Miles: +${addedMiles.toFixed(1)} miles`);
+        } catch (err) {
+          alert('Error importing Grubhub CSV: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // --- SCREEN WAKE LOCK & BACKGROUND AUDIO ---
     async function enableWakeLock() {
       try {
         if ('wakeLock' in navigator) {
@@ -246,15 +315,13 @@
           document.getElementById('wakeLockStatus').innerText = 'Screen: Always On ✓';
           document.getElementById('wakeLockStatus').className = 'text-[10px] text-emerald-400 font-bold';
         }
-      } catch (err) {
-        console.warn('Wake Lock request failed:', err);
-      }
+      } catch (err) { console.warn('WakeLock failed', err); }
     }
 
     function releaseWakeLock() {
       if (wakeLock) {
         wakeLock.release().then(() => { wakeLock = null; });
-        document.getElementById('wakeLockStatus').innerText = 'Screen Lock: Normal';
+        document.getElementById('wakeLockStatus').innerText = 'Screen: Normal';
         document.getElementById('wakeLockStatus').className = 'text-[10px] text-zinc-500 font-bold';
       }
     }
@@ -269,7 +336,7 @@
       if (audio) { audio.pause(); audio.currentTime = 0; }
     }
 
-    // --- DRIVING SHIFT & GPS ---
+    // --- DRIVING SHIFT ---
     function toggleShift() {
       if (!isShiftActive) startLiveShift();
       else endLiveShift();
@@ -286,7 +353,6 @@
       document.getElementById('shiftBadge').innerText = 'ON DUTY';
       document.getElementById('shiftBadge').className = 'text-xs px-3 py-1.5 rounded-full font-black bg-emerald-600 text-white';
 
-      // Keep app and screen alive while multi-apping
       enableWakeLock();
       playKeepAlive();
 
@@ -366,32 +432,25 @@
       return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
-    // --- MULTI-STOP ROUTING (2-3 BATCHED ORDERS) ---
+    // --- MULTI-STOP ROUTING ---
     function cleanAddr(raw) {
       return raw.replace(/(apt|suite|unit|bldg|ste)\s*#?[a-z0-9-]+/gi, '').trim();
     }
 
-    function launchMultiRoute(app) {
+    function launchMultiRoute() {
       const s1 = cleanAddr(document.getElementById('stop1').value);
       const s2 = cleanAddr(document.getElementById('stop2').value);
       const s3 = cleanAddr(document.getElementById('stop3').value);
 
       const stops = [s1, s2, s3].filter(s => s.length > 0);
-      if (stops.length === 0) {
-        alert('Enter at least Stop 1 address.');
-        return;
-      }
+      if (stops.length === 0) { alert('Enter at least Stop 1 address.'); return; }
 
       if (stops.length === 1) {
-        // Single stop
-        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(stops[0])}&travelmode=driving`;
-        window.open(url, '_blank');
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(stops[0])}&travelmode=driving`, '_blank');
       } else {
-        // Multi-stop route: Last stop is destination, earlier stops are waypoints
         const destination = encodeURIComponent(stops[stops.length - 1]);
         const waypoints = stops.slice(0, stops.length - 1).map(s => encodeURIComponent(s)).join('|');
-        const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&waypoints=${waypoints}&travelmode=driving`;
-        window.open(url, '_blank');
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}&waypoints=${waypoints}&travelmode=driving`, '_blank');
       }
     }
 
@@ -401,44 +460,28 @@
       document.getElementById('stop3').value = '';
     }
 
-    // --- VOICE DICTATION FOR ADDRESSES ---
     function voiceDictate(targetInputId) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert('Voice dictation not supported in this browser. Type address directly.');
-        return;
-      }
+      if (!SpeechRecognition) { alert('Voice not supported. Type address directly.'); return; }
       const recognition = new SpeechRecognition();
-      recognition.onstart = () => {
-        document.getElementById(targetInputId).placeholder = 'Listening... Speak address now';
-      };
-      recognition.onresult = (e) => {
-        document.getElementById(targetInputId).value = e.results[0][0].transcript;
-      };
-      recognition.onerror = () => {
-        document.getElementById(targetInputId).placeholder = 'Tap mic to try again';
-      };
+      recognition.onstart = () => { document.getElementById(targetInputId).placeholder = 'Listening... Speak now'; };
+      recognition.onresult = (e) => { document.getElementById(targetInputId).value = e.results[0][0].transcript; };
       recognition.start();
     }
 
-    // --- AI SCREENSHOT ADDRESS READER (GEMINI OCR) ---
+    // --- AI SCREENSHOT READER ---
     async function parseOrderScreenshot(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const key = getGeminiKey();
       const status = document.getElementById('ocrStatus');
       status.classList.remove('hidden');
       status.innerText = 'Reading addresses from screenshot with Gemini...';
-
-      if (!key) {
-        status.innerText = 'No Gemini key set. Open AI Setup above.';
-        return;
-      }
+      if (!key) { status.innerText = 'Add Gemini key in AI Setup first.'; return; }
 
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const base64Data = e.target.result.split(',')[1];
+        const base64 = e.target.result.split(',')[1];
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
             method: 'POST',
@@ -446,13 +489,12 @@
             body: JSON.stringify({
               contents: [{
                 parts: [
-                  { text: "Extract any delivery/pickup addresses from this delivery app screenshot. Return ONLY a JSON array of address strings: [\"123 Main St\", \"456 Elm St\"]" },
-                  { inline_data: { mime_type: file.type || "image/jpeg", data: base64Data } }
+                  { text: "Extract any delivery/pickup addresses from this delivery app screenshot. Return ONLY valid JSON array: [\"123 Main St\", \"456 Elm St\"]" },
+                  { inline_data: { mime_type: file.type || "image/jpeg", data: base64 } }
                 ]
               }]
             })
           });
-
           const data = await res.json();
           const cleanText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
           const addresses = JSON.parse(cleanText);
@@ -463,12 +505,8 @@
             if (addresses[2]) document.getElementById('stop3').value = addresses[2];
             status.innerText = `✓ Found ${addresses.length} address(es) from screenshot!`;
             status.className = 'text-center text-xs py-1 px-2 rounded-lg bg-emerald-950 text-emerald-300 font-bold';
-          } else {
-            status.innerText = 'Could not find clear addresses in image.';
           }
-        } catch (err) {
-          status.innerText = 'Error parsing image: ' + err.message;
-        }
+        } catch (err) { status.innerText = 'Error parsing image.'; }
       };
       reader.readAsDataURL(file);
     }
@@ -478,7 +516,7 @@
       const file = event.target.files[0];
       if (!file) return;
       const key = getGeminiKey();
-      if (!key) { alert('Add your Gemini Key in AI Setup first.'); return; }
+      if (!key) { alert('Add Gemini key in AI Setup first.'); return; }
 
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -499,12 +537,12 @@
           const data = await res.json();
           const parsed = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim());
           alert(`✓ Logged Gas: $${parsed.total} (${parsed.gallons || 0} gal at ${parsed.station || 'Gas Station'})`);
-        } catch (err) { alert('Could not parse receipt. Try a clearer photo.'); }
+        } catch (err) { alert('Could not parse receipt.'); }
       };
       reader.readAsDataURL(file);
     }
 
-    // --- KEYS & SETTINGS ---
+    // --- KEYS ---
     function toggleAiSettings() { document.getElementById('aiSettingsPanel').classList.toggle('hidden'); }
     function saveAiKeys() {
       const raw = document.getElementById('geminiKeysInput').value;
@@ -521,7 +559,7 @@
       return k;
     }
 
-    // --- FINANCIALS & EXPORT ---
+    // --- FINANCIALS & EXPORTS ---
     function showOrderLogger() { document.getElementById('orderLogPanel').classList.remove('hidden'); }
     function hideOrderLogger() { document.getElementById('orderLogPanel').classList.add('hidden'); }
 
