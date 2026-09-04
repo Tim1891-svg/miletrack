@@ -77,47 +77,79 @@
     </button>
   </div>
 
-  <!-- SECTION 2: MULTI-STOP DELIVERY ROUTER (2-3 BATCHED ORDERS) -->
-  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl space-y-3">
+  <!-- SECTION 2: MULTI-STOP DELIVERY ROUTER (UP TO 6 STOPS) -->
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl space-y-2.5">
     <div class="flex justify-between items-center">
-      <span class="text-xs font-black text-amber-400 uppercase tracking-wider">📦 Multi-Stop Deliveries (2-3 Orders)</span>
+      <span class="text-xs font-black text-amber-400 uppercase tracking-wider">📦 Multi-Stop Router (Up to 6)</span>
       <label class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-[11px] text-sky-400 font-bold rounded-lg cursor-pointer flex items-center gap-1">
         <span>📸</span> Read Screenshot
         <input type="file" accept="image/*" onchange="parseOrderScreenshot(event)" class="hidden">
       </label>
     </div>
 
+    <!-- Stop 1 -->
     <div class="flex items-center gap-2">
       <span class="w-6 text-center text-xs font-black text-emerald-400">1</span>
       <input type="text" id="stop1" placeholder="Stop 1: Restaurant or Customer..." 
-             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
-      <button onclick="voiceDictate('stop1')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm">🎙️</button>
+             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
+      <button onclick="voiceDictate('stop1')" class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-xs">🎙️</button>
     </div>
 
+    <!-- Stop 2 -->
     <div class="flex items-center gap-2">
-      <span class="w-6 text-center text-xs font-black text-amber-400">2</span>
-      <input type="text" id="stop2" placeholder="Stop 2: Next Customer drop..." 
-             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
-      <button onclick="voiceDictate('stop2')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm">🎙️</button>
+      <span class="w-6 text-center text-xs font-black text-emerald-400">2</span>
+      <input type="text" id="stop2" placeholder="Stop 2: Next pickup or drop..." 
+             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
+      <button onclick="voiceDictate('stop2')" class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-xs">🎙️</button>
     </div>
 
+    <!-- Stop 3 -->
     <div class="flex items-center gap-2">
-      <span class="w-6 text-center text-xs font-black text-sky-400">3</span>
-      <input type="text" id="stop3" placeholder="Stop 3: Final drop (Optional)..." 
-             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
-      <button onclick="voiceDictate('stop3')" class="p-3 bg-zinc-800 active:bg-zinc-700 rounded-xl text-sm">🎙️</button>
+      <span class="w-6 text-center text-xs font-black text-amber-400">3</span>
+      <input type="text" id="stop3" placeholder="Stop 3: Drop-off..." 
+             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
+      <button onclick="voiceDictate('stop3')" class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-xs">🎙️</button>
     </div>
 
-    <div class="grid grid-cols-2 gap-2 pt-1">
-      <button onclick="launchMultiRoute('google')" 
-              class="w-full h-12 bg-blue-600 active:bg-blue-700 rounded-xl font-black text-xs flex justify-center items-center gap-2 shadow-lg">
-        <span>🗺️</span> ROUTE ALL IN MAPS
+    <!-- Stop 4 (Expandable) -->
+    <div id="rowStop4" class="hidden flex items-center gap-2">
+      <span class="w-6 text-center text-xs font-black text-amber-400">4</span>
+      <input type="text" id="stop4" placeholder="Stop 4: Next drop..." 
+             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
+      <button onclick="voiceDictate('stop4')" class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-xs">🎙️</button>
+    </div>
+
+    <!-- Stop 5 (Expandable) -->
+    <div id="rowStop5" class="hidden flex items-center gap-2">
+      <span class="w-6 text-center text-xs font-black text-sky-400">5</span>
+      <input type="text" id="stop5" placeholder="Stop 5: Customer drop..." 
+             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
+      <button onclick="voiceDictate('stop5')" class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-xs">🎙️</button>
+    </div>
+
+    <!-- Stop 6 (Expandable) -->
+    <div id="rowStop6" class="hidden flex items-center gap-2">
+      <span class="w-6 text-center text-xs font-black text-purple-400">6</span>
+      <input type="text" id="stop6" placeholder="Stop 6: Final drop..." 
+             class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-sm text-white font-medium focus:outline-none focus:border-amber-400">
+      <button onclick="voiceDictate('stop6')" class="p-2.5 bg-zinc-800 active:bg-zinc-700 rounded-xl text-xs">🎙️</button>
+    </div>
+
+    <!-- Dynamic Add Stop Button -->
+    <div class="flex justify-between items-center pt-1">
+      <button onclick="addMoreStops()" id="btnAddStop" class="text-xs text-amber-400 font-bold hover:underline flex items-center gap-1">
+        <span>+</span> Add Stop (Up to 6)
       </button>
-      <button onclick="clearStops()" 
-              class="w-full h-12 bg-zinc-800 active:bg-zinc-700 rounded-xl font-bold text-xs text-zinc-400 flex justify-center items-center gap-1">
-        <span>✕</span> Clear Stops
+      <button onclick="clearStops()" class="text-xs text-zinc-500 hover:text-red-400 font-bold">
+        Clear All
       </button>
     </div>
+
+    <!-- Launch 6-Stop Multi-Route in Google Maps -->
+    <button onclick="launchMultiRoute()" 
+            class="w-full h-13 py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-black text-sm flex justify-center items-center gap-2 shadow-lg transition">
+      <span>🗺️</span> ROUTE ALL STOPS IN GOOGLE MAPS
+    </button>
     <div id="ocrStatus" class="hidden text-center text-xs py-1 px-2 rounded-lg bg-zinc-800 text-zinc-300 font-bold"></div>
   </div>
 
@@ -224,6 +256,7 @@
     let totalShiftMiles = 0;
     let totalGrossPay = parseFloat(localStorage.getItem('mp_gross_pay') || '0');
     let wakeLock = null;
+    let visibleStopsCount = 3;
 
     let geminiKeys = (localStorage.getItem('mp_gemini_keys') || '').split(',').map(k => k.trim()).filter(k => k.length > 0);
     let activeKeyIdx = 0;
@@ -233,6 +266,114 @@
     function init() {
       updateFinancialDashboard();
       document.getElementById('geminiKeysInput').value = geminiKeys.join(', ');
+    }
+
+    // --- EXPANDABLE 6-STOP ROUTER CONTROLS ---
+    function addMoreStops() {
+      if (visibleStopsCount < 6) {
+        visibleStopsCount++;
+        document.getElementById(`rowStop${visibleStopsCount}`).classList.remove('hidden');
+        if (visibleStopsCount === 6) {
+          document.getElementById('btnAddStop').classList.add('hidden');
+        }
+      }
+    }
+
+    function cleanAddr(raw) {
+      return raw.replace(/(apt|suite|unit|bldg|ste)\s*#?[a-z0-9-]+/gi, '').trim();
+    }
+
+    function launchMultiRoute() {
+      const allStops = [
+        cleanAddr(document.getElementById('stop1').value),
+        cleanAddr(document.getElementById('stop2').value),
+        cleanAddr(document.getElementById('stop3').value),
+        cleanAddr(document.getElementById('stop4').value),
+        cleanAddr(document.getElementById('stop5').value),
+        cleanAddr(document.getElementById('stop6').value)
+      ].filter(s => s.length > 0);
+
+      if (allStops.length === 0) {
+        alert('Please enter at least Stop 1 address.');
+        return;
+      }
+
+      if (allStops.length === 1) {
+        // Single stop
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(allStops[0])}&travelmode=driving`, '_blank');
+      } else {
+        // Multi-stop: Final stop is destination, earlier stops are waypoints in order
+        const destination = encodeURIComponent(allStops[allStops.length - 1]);
+        const waypoints = allStops.slice(0, allStops.length - 1).map(s => encodeURIComponent(s)).join('|');
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&waypoints=${waypoints}&travelmode=driving`;
+        window.open(url, '_blank');
+      }
+    }
+
+    function clearStops() {
+      for (let i = 1; i <= 6; i++) {
+        document.getElementById(`stop${i}`).value = '';
+      }
+      visibleStopsCount = 3;
+      document.getElementById('rowStop4').classList.add('hidden');
+      document.getElementById('rowStop5').classList.add('hidden');
+      document.getElementById('rowStop6').classList.add('hidden');
+      document.getElementById('btnAddStop').classList.remove('hidden');
+    }
+
+    function voiceDictate(targetInputId) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) { alert('Voice not supported. Type address directly.'); return; }
+      const recognition = new SpeechRecognition();
+      recognition.onstart = () => { document.getElementById(targetInputId).placeholder = 'Listening... Speak address now'; };
+      recognition.onresult = (e) => { document.getElementById(targetInputId).value = e.results[0][0].transcript; };
+      recognition.start();
+    }
+
+    // --- AI SCREENSHOT READER (PARSES UP TO 6 ADDRESSES) ---
+    async function parseOrderScreenshot(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const key = getGeminiKey();
+      const status = document.getElementById('ocrStatus');
+      status.classList.remove('hidden');
+      status.innerText = 'Reading batched addresses from screenshot with Gemini...';
+      if (!key) { status.innerText = 'Add Gemini key in AI Setup first.'; return; }
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64 = e.target.result.split(',')[1];
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: "Extract all restaurant pickup and customer delivery addresses from this order screenshot. Return ONLY a valid JSON array of up to 6 address strings in order: [\"123 Main St\", \"456 Elm St\"]" },
+                  { inline_data: { mime_type: file.type || "image/jpeg", data: base64 } }
+                ]
+              }]
+            })
+          });
+          const data = await res.json();
+          const cleanText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+          const addresses = JSON.parse(cleanText);
+
+          if (Array.isArray(addresses) && addresses.length > 0) {
+            for (let i = 0; i < Math.min(addresses.length, 6); i++) {
+              const stopNum = i + 1;
+              if (stopNum > 3) {
+                document.getElementById(`rowStop${stopNum}`).classList.remove('hidden');
+              }
+              document.getElementById(`stop${stopNum}`).value = addresses[i];
+            }
+            status.innerText = `✓ Found and filled ${addresses.length} address(es)!`;
+            status.className = 'text-center text-xs py-1 px-2 rounded-lg bg-emerald-950 text-emerald-300 font-bold';
+          }
+        } catch (err) { status.innerText = 'Could not read addresses from screenshot.'; }
+      };
+      reader.readAsDataURL(file);
     }
 
     // --- GRUBHUB CSV SMART IMPORTER & DEDUPLICATOR ---
@@ -246,28 +387,19 @@
           const lines = evt.target.result.split('\n');
           if (lines.length < 2) return;
 
-          let acceptedCount = 0;
-          let missionCount = 0;
-          let addedEarnings = 0;
-          let addedMiles = 0;
-
+          let acceptedCount = 0, missionCount = 0, addedEarnings = 0, addedMiles = 0;
           const existingTrips = new Set(JSON.parse(localStorage.getItem('mp_gh_dedup') || '[]'));
           const history = JSON.parse(localStorage.getItem('miletrack_history') || '[]');
 
           for (let i = 1; i < lines.length; i++) {
             const row = lines[i].trim();
             if (!row) continue;
-
             const cols = row.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-            const dt = cols[0];
-            const type = cols[1];
-            const amountStr = cols[2]?.replace(/[$\s]/g, '');
-            const amount = parseFloat(amountStr) || 0;
-            const status = cols[4];
-            const restaurant = cols[5] || 'Grubhub';
+            const dt = cols[0], type = cols[1];
+            const amount = parseFloat(cols[2]?.replace(/[$\s]/g, '')) || 0;
+            const status = cols[4], restaurant = cols[5] || 'Grubhub';
             const miles = parseFloat(cols[7]) || 0;
 
-            // Composite Deduplication Key
             const dedupKey = `${dt}_${type}_${amount}_${restaurant}`;
             if (existingTrips.has(dedupKey)) continue;
 
@@ -276,7 +408,6 @@
               addedEarnings += amount;
               addedMiles += miles;
               existingTrips.add(dedupKey);
-
               history.push({
                 date: dt.split('T')[0],
                 time: dt.split('T')[1]?.substring(0, 5) || '',
@@ -293,16 +424,12 @@
 
           localStorage.setItem('mp_gh_dedup', JSON.stringify(Array.from(existingTrips)));
           localStorage.setItem('miletrack_history', JSON.stringify(history));
-
           totalGrossPay += addedEarnings;
           localStorage.setItem('mp_gross_pay', totalGrossPay.toString());
-
           updateFinancialDashboard();
 
           alert(`✓ GRUBHUB IMPORT COMPLETE!\n• Added: ${acceptedCount} Deliveries & ${missionCount} Missions\n• New Earnings: +$${addedEarnings.toFixed(2)}\n• Engaged Miles: +${addedMiles.toFixed(1)} miles`);
-        } catch (err) {
-          alert('Error importing Grubhub CSV: ' + err.message);
-        }
+        } catch (err) { alert('Error importing Grubhub CSV: ' + err.message); }
       };
       reader.readAsText(file);
     }
@@ -430,85 +557,6 @@
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                 Math.sin(dLon/2) * Math.sin(dLon/2);
       return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
-    // --- MULTI-STOP ROUTING ---
-    function cleanAddr(raw) {
-      return raw.replace(/(apt|suite|unit|bldg|ste)\s*#?[a-z0-9-]+/gi, '').trim();
-    }
-
-    function launchMultiRoute() {
-      const s1 = cleanAddr(document.getElementById('stop1').value);
-      const s2 = cleanAddr(document.getElementById('stop2').value);
-      const s3 = cleanAddr(document.getElementById('stop3').value);
-
-      const stops = [s1, s2, s3].filter(s => s.length > 0);
-      if (stops.length === 0) { alert('Enter at least Stop 1 address.'); return; }
-
-      if (stops.length === 1) {
-        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(stops[0])}&travelmode=driving`, '_blank');
-      } else {
-        const destination = encodeURIComponent(stops[stops.length - 1]);
-        const waypoints = stops.slice(0, stops.length - 1).map(s => encodeURIComponent(s)).join('|');
-        window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}&waypoints=${waypoints}&travelmode=driving`, '_blank');
-      }
-    }
-
-    function clearStops() {
-      document.getElementById('stop1').value = '';
-      document.getElementById('stop2').value = '';
-      document.getElementById('stop3').value = '';
-    }
-
-    function voiceDictate(targetInputId) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) { alert('Voice not supported. Type address directly.'); return; }
-      const recognition = new SpeechRecognition();
-      recognition.onstart = () => { document.getElementById(targetInputId).placeholder = 'Listening... Speak now'; };
-      recognition.onresult = (e) => { document.getElementById(targetInputId).value = e.results[0][0].transcript; };
-      recognition.start();
-    }
-
-    // --- AI SCREENSHOT READER ---
-    async function parseOrderScreenshot(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const key = getGeminiKey();
-      const status = document.getElementById('ocrStatus');
-      status.classList.remove('hidden');
-      status.innerText = 'Reading addresses from screenshot with Gemini...';
-      if (!key) { status.innerText = 'Add Gemini key in AI Setup first.'; return; }
-
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64 = e.target.result.split(',')[1];
-        try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{
-                parts: [
-                  { text: "Extract any delivery/pickup addresses from this delivery app screenshot. Return ONLY valid JSON array: [\"123 Main St\", \"456 Elm St\"]" },
-                  { inline_data: { mime_type: file.type || "image/jpeg", data: base64 } }
-                ]
-              }]
-            })
-          });
-          const data = await res.json();
-          const cleanText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-          const addresses = JSON.parse(cleanText);
-
-          if (Array.isArray(addresses) && addresses.length > 0) {
-            if (addresses[0]) document.getElementById('stop1').value = addresses[0];
-            if (addresses[1]) document.getElementById('stop2').value = addresses[1];
-            if (addresses[2]) document.getElementById('stop3').value = addresses[2];
-            status.innerText = `✓ Found ${addresses.length} address(es) from screenshot!`;
-            status.className = 'text-center text-xs py-1 px-2 rounded-lg bg-emerald-950 text-emerald-300 font-bold';
-          }
-        } catch (err) { status.innerText = 'Error parsing image.'; }
-      };
-      reader.readAsDataURL(file);
     }
 
     // --- GAS RECEIPT SCANNER ---
